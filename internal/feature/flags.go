@@ -105,7 +105,7 @@ var optimizeAggregateWindow = feature.MakeBoolFlag(
 	"Optimize Aggregate Window",
 	"optimizeAggregateWindow",
 	"Jonathan Sternberg",
-	true,
+	false,
 )
 
 // OptimizeAggregateWindow - Enables a version of aggregateWindow written in Go

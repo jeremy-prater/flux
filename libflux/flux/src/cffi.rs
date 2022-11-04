@@ -432,7 +432,7 @@ fn new_stateful_analyzer(options: Options) -> Result<StatefulAnalyzer> {
     };
 
     let db = if options.features.contains(&Feature::SalsaDatabase) {
-        Some(new_db()?)
+        Some(new_db(options.clone())?)
     } else {
         None
     };
@@ -456,11 +456,11 @@ pub struct StatefulAnalyzer {
 
 impl StatefulAnalyzer {
     fn analyze(&mut self, ast_pkg: &ast::Package) -> Result<fluxcore::semantic::nodes::Package> {
-        let Options { features } = self.options.clone();
+        let Options { features, .. } = self.options.clone();
 
         let env = Environment::from(&self.env);
 
-        let result = if let Some(db) = &self.db {
+        let result = if let Some(db) = &mut self.db {
             let mut db = db as &dyn Flux;
             let mut analyzer = Analyzer::new(env, &mut db, AnalyzerConfig { features });
             analyzer.analyze_ast(ast_pkg)
@@ -575,6 +575,10 @@ pub struct Options {
     /// Features used in the flux compiler
     #[serde(default)]
     pub features: Vec<Feature>,
+
+    /// API token used to authenticate against fluxmod
+    #[serde(default)]
+    pub fluxmod_token: Option<String>,
 }
 
 impl Options {
@@ -603,15 +607,14 @@ impl Options {
 /// that has been type-inferred.  This function is aware of the standard library
 /// and prelude.
 pub fn analyze(ast_pkg: &ast::Package, options: Options) -> SalvageResult<Package, Error> {
-    let Options { features } = options;
-
-    if features.contains(&Feature::SalsaDatabase) {
-        let mut analyzer = new_semantic_salsa_analyzer(AnalyzerConfig { features })?;
+    if options.features.contains(&Feature::SalsaDatabase) {
+        let mut analyzer = new_semantic_salsa_analyzer(options)?;
         let (_, sem_pkg) = analyzer
             .analyze_ast(ast_pkg)
             .map_err(|salvage| salvage.err_into().map(|(_, sem_pkg)| sem_pkg))?;
         Ok(sem_pkg)
     } else {
+        let Options { features, .. } = options;
         let mut analyzer = new_semantic_analyzer(AnalyzerConfig { features })?;
         let (_, sem_pkg) = analyzer
             .analyze_ast(ast_pkg)

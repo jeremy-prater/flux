@@ -46,6 +46,10 @@ var _ Transformation = (*consecutiveTransport)(nil)
 
 // consecutiveTransport implements Transport by transporting data consecutively to the downstream Transformation.
 type consecutiveTransport struct {
+	schedulerState int32
+	inflight       int32
+	totalMsgs      int32
+
 	ctx        context.Context
 	dispatcher Dispatcher
 	logger     *zap.Logger
@@ -58,10 +62,6 @@ type consecutiveTransport struct {
 	finished chan struct{}
 	errMu    sync.Mutex
 	errValue error
-
-	schedulerState int32
-	inflight       int32
-	totalMsgs      int32
 
 	initSpanOnce sync.Once
 	span         opentracing.Span

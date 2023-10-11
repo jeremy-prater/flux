@@ -511,12 +511,12 @@ func readMetadata(r *bufferedCSVReader, c ResultDecoderConfig) (tableMetadata, e
 }
 
 type tableDecoder struct {
-	r *bufferedCSVReader
-	c ResultDecoderConfig
+	used int32
+	r    *bufferedCSVReader
+	c    ResultDecoderConfig
 
 	meta tableMetadata
 
-	used  int32
 	empty bool
 
 	initialized bool

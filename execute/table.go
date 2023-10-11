@@ -1283,13 +1283,13 @@ func (b *ColListTableBuilder) Sort(cols []string, desc bool) {
 // All data for the table is stored in RAM.
 // As a result At* methods are provided directly on the table for easy access.
 type ColListTable struct {
+	used     int32
+	refCount int32
+
 	key     flux.GroupKey
 	colMeta []flux.ColMeta
 	cols    []column
 	nrows   int
-
-	used     int32
-	refCount int32
 }
 
 func (t *ColListTable) RefCount(n int) {
@@ -2106,9 +2106,9 @@ func (d *tableBuilderCache) ForEachWithContext(f func(flux.GroupKey, Trigger, Ta
 }
 
 type emptyTable struct {
+	used int32
 	key  flux.GroupKey
 	cols []flux.ColMeta
-	used int32
 }
 
 // NewEmptyTable constructs a new empty table with the given

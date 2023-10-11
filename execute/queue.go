@@ -13,11 +13,11 @@ type MessageQueue interface {
 }
 
 type unboundedMessageQueue struct {
+	len  int32
 	buf  []Message
 	head int
 	tail int
 	mu   sync.Mutex
-	len  int32
 }
 
 func newMessageQueue(n int) *unboundedMessageQueue {

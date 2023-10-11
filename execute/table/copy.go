@@ -47,10 +47,10 @@ func Copy(t flux.Table) (flux.BufferedTable, error) {
 //
 // This implements the flux.BufferedTable interface.
 type tableBuffer struct {
+	used    int32
 	key     flux.GroupKey
 	colMeta []flux.ColMeta
 	buffers []flux.ColReader
-	used    int32
 }
 
 func (tb *tableBuffer) Key() flux.GroupKey {
